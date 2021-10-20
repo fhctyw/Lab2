@@ -198,42 +198,99 @@ int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& si
 	return res;
 }
 
+int*** Multiply(const int *a, const int size_a, const int *b, const int size_b, int* size, bool isPrinted = false, const char* addString = nullptr)
+{
+	size = new int[3]{size_a, size_b, 2};
+
+	int ***res = new int**[size_a];
+	for (int i = 0; i < size_a; i++)
+	{
+		res[i] = new int*[size_b];
+		for (int j = 0; j < size_b; j++)
+		{
+			int * consist = new int[2]{ a[i], b[j] };
+			res[i][j] = consist;
+		}
+	}
+
+	if (isPrinted) {
+		if (addString != nullptr)
+		{
+			cout << "[" << addString << "] ";
+		}
+
+		cout << "{";
+		for (int i = 0; i < size_a; i++)
+		{
+			for (int j = 0; j < size_b; j++)
+			{
+				cout << "(" << res[i][j][0] << ", " << res[i][j][1] << ") ";
+			}
+
+			if (i != size_a - 1)
+				cout << endl;
+			else
+				cout << "}";
+		}
+		cout << endl;
+	}
+
+	return res;
+}
 
 // ((A u C)\C u B)\(!C) 
 int main()
 {
 	// U[25]
 	SetUniversalPlural(1, 25);
-	PrintPluar(UniversalPlural, UniversalPluralSize, "U");
-	PrintPluar(A, SizeA, "A");
-	PrintPluar(B, SizeB, "B");
-	PrintPluar(C, SizeC, "C");
+	//PrintPluar(UniversalPlural, UniversalPluralSize, "U");
+	//PrintPluar(A, SizeA, "A");
+	//PrintPluar(B, SizeB, "B");
+	//PrintPluar(C, SizeC, "C");
+	//cout << endl;
+
+	//// A u C
+	//int size_p1;
+	//int* p1 = Unification(A, SizeA, C, SizeC, size_p1);
+	//PrintPluar(p1, size_p1, "A u C");
+
+	//// !C
+	//int size_p2;
+	//int* p2 = Not(C, SizeC, size_p2);
+	//PrintPluar(p2, size_p2, "!C");
+
+	//// (A u C) \ C
+	//int size_p3;
+	//int* p3 = Divide(p1, size_p1, C, SizeC, size_p3);
+	//PrintPluar(p3, size_p3, "(A u C) \\ C");
+
+	//// ((A u C) \ C) u B
+	//int size_p4;
+	//int* p4 = Unification(p3, size_p3, B, SizeB, size_p4);
+	//PrintPluar(p4, size_p4, "((A u C) \\ C) u B");
+
+	//// (((A u C) \ C) u B) \ (!C)
+	//int size_p5;
+	//int *p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
+	//PrintPluar(p5, size_p5, "((A u C)\\C u B)\\(!C)");
+
+	int *size = 0;
+	int*** tmp = Multiply(A, SizeA, B, SizeB, size);
+
+	cout << "{";
+	for (int i = 0; i < size[0]; i++)
+	{
+		for (int j = 0; j < size[1]; j++)
+		{
+			cout << "(" << tmp[i][j][0] << ", " << tmp[i][j][1] << ") ";
+		}
+
+		if (i != size[1] - 1)
+			cout << endl;
+		else
+			cout << "}";
+	}
 	cout << endl;
-
-	// A u C
-	int size_p1;
-	int* p1 = Unification(A, SizeA, C, SizeC, size_p1);
-	PrintPluar(p1, size_p1, "A u C");
-
-	// !C
-	int size_p2;
-	int* p2 = Not(C, SizeC, size_p2);
-	PrintPluar(p2, size_p2, "!C");
-
-	// (A u C) \ C
-	int size_p3;
-	int* p3 = Divide(p1, size_p1, C, SizeC, size_p3);
-	PrintPluar(p3, size_p3, "(A u C) \\ C");
-
-	// ((A u C) \ C) u B
-	int size_p4;
-	int* p4 = Unification(p3, size_p3, B, SizeB, size_p4);
-	PrintPluar(p4, size_p4, "((A u C) \\ C) u B");
-
-	// (((A u C) \ C) u B) \ (!C)
-	int size_p5;
-	int *p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
-	PrintPluar(p5, size_p5, "((A u C)\\C u B)\\(!C)");
 
 	return 0;
 }
