@@ -120,6 +120,10 @@ void unification(const int *a, const int size_a, const int *b, const int size_b,
 		}
 	}
 
+	for (int i = 0; i < size_c; i++)
+	{
+		cout << tmp2[i] << endl;
+	}
 
 	int size = size_a + indexTmpArray;
 	c = new int[size];
@@ -136,14 +140,14 @@ int main()
 	//unification(A, 9, C, 9, arr_1, size_arr_1);
 	
 	while (true) {
-		int* res = NULL;
-		int size_res;
-		Divide(A, 9, C, 9, res, size_res);
-		
-		for (int i = 0; i < size_res; i++)
-		{
-			cout << res[i] << endl;
-		}
+	int* res = NULL;
+	int size_res;
+	Divide(A, 9, C, 9, res, size_res);
+	
+	for (int i = 0; i < size_res; i++)
+	{
+		cout << res[i] << endl;
+	}
 
 		delete[] res;
 	}
