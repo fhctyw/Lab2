@@ -1,17 +1,56 @@
 #include <iostream>
+#include <algorithm>
 #include <cmath>
 using namespace std;
 
-// input
-int A[9] = {1, 2, 3, 4, 13, 14, 16, 17, 21};
-int C[9] = {1, 9, 10, 11, 12, 13, 18, 19, 24};
-int B[10] = {1, 3, 4, 5, 6, 13, 14, 15, 20, 21};
+#define GET_ARRAY_LENGHT _countof
 
-// output
-int F[4];
+int UniversalPluralSize;
+int* UniversalPlural;
+
+// input
+int A[] = { 1, 2, 3, 4, 13, 14, 16, 17, 21 };
+const int SizeA = GET_ARRAY_LENGHT(A);
+int B[] = { 1, 3, 4, 5, 6, 13, 14, 15, 20, 21 };
+const int SizeB = GET_ARRAY_LENGHT(B);
+int C[] = { 1, 9, 10, 11, 12, 13, 18, 19, 24 };
+const int SizeC = GET_ARRAY_LENGHT(C);
+
+
+// from = -100, to = 200 = {-100, -99, -98 ... 198, 199, 200 }
+void SetUniversalPlural(const int from, const int to)
+{
+	UniversalPluralSize = to - from + 1;
+	UniversalPlural = new int[UniversalPluralSize];
+	for (int i = 0; i < UniversalPluralSize; i++)
+	{
+		UniversalPlural[i] = from + i;
+	}
+}
+
+// Print array
+void PrintPluar(const int* p, const int size, const char* addString = nullptr)
+{
+	if (addString != nullptr)
+	{
+		cout << "[" << addString << "] ";
+	}
+
+	cout << "{";
+	for (int i = 0; i < size; i++)
+	{
+		cout << p[i];
+		if (i != size - 1)
+		{
+			cout << ", ";
+		}
+	}
+	cout << "}" << endl;
+}
 
 // A \ B
-void Divide(const int *a, const int size_a, const int *b, const int size_b, int *c, int &size_c)
+// {0, 4, -1, 5} \ {2, 3, 5, -2, 0} = {4, -1}
+int* Divide(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
 {
 	int index = 0;
 	int* tmp = new int[size_a];
@@ -27,12 +66,12 @@ void Divide(const int *a, const int size_a, const int *b, const int size_b, int 
 		}
 	}
 
-	size_c = size_a - index;
-	int *res = new int[size_c];
+	size = size_a - index;
+	int* res = new int[size];
 
 	for (int i = 0, i1 = 0; i < size_a; i++)
 	{
- 		if (i == tmp[i1])
+		if (i == tmp[i1])
 		{
 			i1++;
 		}
@@ -42,44 +81,43 @@ void Divide(const int *a, const int size_a, const int *b, const int size_b, int 
 		}
 	}
 
-	for (int i = 0; i < size_c; i++)
-	{
-		cout << res[i] << endl;
-	}
-
 	delete[] tmp;
 	tmp = nullptr;
-	delete c;
-	
-	c = res;
+
+	if (isSort)
+		sort(res, res + size);
+
+	return res;
 }
 
-// ((A u C)\C u B)\(!C) 
+// A + B
+// {0, 1, 2, 3} + {5, 8, 0, 1, 2} = {0, 1, 2, 3, 5, 8, 0, 1, 2}
+int* Add(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
+{
+	size = size_a + size_b;
+	int* res = new int[size];
+	int total = 0;
 
-/*
-int A1[] = { 1, 2, 3, 4 ,9, 10, 11, 12, 13, 14, 16, 17, 18, 19, 21, 24 };
+	for (int i = 0; i < size_a; i++, total++)
+	{
+		res[i] = a[i];
+	}
 
-int C1[9] = { 1, 9, 10, 11, 12, 13, 18, 19, 24 };
+	for (int i = 0; i < size_b && total < size; i++, total++)
+	{
+		res[total] = b[i];
+	}
 
-int Result[] = { 2, 3, 4, 14, 16, 17, 21 };
-int B[10] = { 1, 3, 4, 5, 6, 13, 14, 15, 20, 21 };
+	if (isSort)
+		sort(res, res + size);
 
-int temp[] = { 1, 2, 3, 4, 5, 6, 13, 14, 15, 16, 17, 20, 21 };
-
-
-
-int res[] = { 2, 3, 4, 5, 6, 7, 8, 14, 17, 20, 21, 22, 23, 25 };
-
-
-int finialResult[] = { 1, 13, 15, 16 };
-*/
+	return res;
+}
 
 // A u B
-void unification(const int *a, const int size_a, const int *b, const int size_b, int *c, int &size_c)
+// {0, -1, -3, 5, 4, 9} u {3, 2, 5, 6, 7} = {-3, -1, 0, 2, 3, 4, 5, 6, 7, 9 }
+int* Unification(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
 {
-	//	{1, 2, 3, 4, 13, 14, 16, 17, 21};
-	//	{1, 9, 10, 11, 12, 13, 18, 19, 24};
-
 	int* tmp = new int[size_b];
 	int indexTmpArray = 0;
 
@@ -99,58 +137,100 @@ void unification(const int *a, const int size_a, const int *b, const int size_b,
 	for (int i = 0; i < indexTmpArray; i++)
 	{
 		tmp1[i] = tmp[i];
+		//cout << tmp[i] << " ";
 	}
+
 	delete[] tmp;
 	tmp = nullptr;
-	
-	size_c = size_b - indexTmpArray;
-	int* tmp2 = new int[size_c];
-	int indexTmp1Array = 0;
+	int s;
+	int* tmp2 = Divide(b, size_b, tmp1, indexTmpArray, s);
 
-	for (int i = 0; i < size_b; i++)
+	delete[] tmp1;
+
+	int* res = Add(tmp2, s, a, size_a, size);
+
+	if (isSort)
+		sort(res, res + size);
+
+	return res;
+}
+
+// !A
+// {1, 3, 5, 7, 14} = { 2, 4, 6, 8, 9, 10, 11, 12, 13, 15, ... , 25 }
+int* Not(const int* a, const int size_a, int& size, bool isSort = true)
+{
+	return Divide(UniversalPlural, UniversalPluralSize, a, size_a, size);
+}
+
+// A ^ B
+//   { 0, -1, 3, 5, 6 } ^ { 2, 3, 9, 10, 6 } = { 3, 6 }
+int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
+{
+	int s = 0;
+	for (int i = 0; i < size_a; i++)
 	{
-		for (int j = 0; j < indexTmpArray; j++)
+		for (int j = 0; j < size_b; j++)
 		{
-			if (b[i] != tmp1[j])
+			if (a[i] == b[j])
 			{
-				tmp2[i] = b[i];
-				indexTmp1Array++;
+				s++;
 			}
-			
+		}
+	}
+	
+	size = s;
+	int *res = new int[size];
+	for (int i = 0, s = 0; i < size_a; i++)
+	{
+		for (int j = 0; j < size_b; j++)
+		{
+			if (a[i] == b[j])
+			{
+				res[s] = a[i];
+				s++;
+			}
 		}
 	}
 
-	for (int i = 0; i < size_c; i++)
-	{
-		cout << tmp2[i] << endl;
-	}
-
-	int size = size_a + indexTmpArray;
-	c = new int[size];
-
-
-
+	return res;
 }
 
 
+// ((A u C)\C u B)\(!C) 
 int main()
 {
-	int arr_1[20];
-	int size_arr_1;
-	//unification(A, 9, C, 9, arr_1, size_arr_1);
-	
-	while (true) {
-	int* res = NULL;
-	int size_res;
-	Divide(A, 9, C, 9, res, size_res);
-	
-	for (int i = 0; i < size_res; i++)
-	{
-		cout << res[i] << endl;
-	}
+	// U[25]
+	SetUniversalPlural(1, 25);
+	PrintPluar(UniversalPlural, UniversalPluralSize, "U");
+	PrintPluar(A, SizeA, "A");
+	PrintPluar(B, SizeB, "B");
+	PrintPluar(C, SizeC, "C");
+	cout << endl;
 
-		delete[] res;
-	}
+	// A u C
+	int size_p1;
+	int* p1 = Unification(A, SizeA, C, SizeC, size_p1);
+	PrintPluar(p1, size_p1, "A u C");
+
+	// !C
+	int size_p2;
+	int* p2 = Not(C, SizeC, size_p2);
+	PrintPluar(p2, size_p2, "!C");
+
+	// (A u C) \ C
+	int size_p3;
+	int* p3 = Divide(p1, size_p1, C, SizeC, size_p3);
+	PrintPluar(p3, size_p3, "(A u C) \\ C");
+
+	// ((A u C) \ C) u B
+	int size_p4;
+	int* p4 = Unification(p3, size_p3, B, SizeB, size_p4);
+	PrintPluar(p4, size_p4, "((A u C) \\ C) u B");
+
+	// (((A u C) \ C) u B) \ (!C)
+	int size_p5;
+	int *p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
+	PrintPluar(p5, size_p5, "((A u C)\\C u B)\\(!C)");
 
 	return 0;
 }
