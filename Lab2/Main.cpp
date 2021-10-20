@@ -3,19 +3,37 @@
 #include <cmath>
 using namespace std;
 
+// Your defines
+#define VERSION_1
+//
+
 #define GET_ARRAY_LENGHT _countof
 
 int UniversalPluralSize;
 int* UniversalPlural;
 
 // input
+
+#ifdef VERSION_1
 int A[] = { 1, 2, 3, 4, 13, 14, 16, 17, 21 };
-const int SizeA = GET_ARRAY_LENGHT(A);
 int B[] = { 1, 3, 4, 5, 6, 13, 14, 15, 20, 21 };
-const int SizeB = GET_ARRAY_LENGHT(B);
 int C[] = { 1, 9, 10, 11, 12, 13, 18, 19, 24 };
+
+const int SizeA = GET_ARRAY_LENGHT(A);
+const int SizeB = GET_ARRAY_LENGHT(B);
 const int SizeC = GET_ARRAY_LENGHT(C);
 
+#endif // VERSION_1
+
+#ifdef VERSION_2
+
+int A[] = { 1, 8, 9 };
+int B[] = { 6, 8 };
+
+const int SizeA = GET_ARRAY_LENGHT(A);
+const int SizeB = GET_ARRAY_LENGHT(B);
+
+#endif // VERSION_1
 
 // from = -100, to = 200 = {-100, -99, -98 ... 198, 199, 200 }
 void SetUniversalPlural(const int from, const int to)
@@ -198,12 +216,100 @@ int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& si
 	return res;
 }
 
+// A x B
+// {0, 3, 5} x {3, 7} = { (0, 3), {0, 7}, (3, 3), (3, 7), (5, 3), (5, 7) }
+int*** Multiply(const int *a, const int size_a, const int *b, const int size_b, int size[], bool isPrinted = false, const char* addString = nullptr)
+{
+	if (size != nullptr)
+	{
+		size[0] = size_a;
+		size[1] = size_b;
+		size[2] = 2;
+	}
 
-// ((A u C)\C u B)\(!C) 
+	int ***res = new int**[size_a];
+	for (int i = 0; i < size_a; i++)
+	{
+		res[i] = new int*[size_b];
+		for (int j = 0; j < size_b; j++)
+		{
+			int * consist = new int[2]{ a[i], b[j] };
+			res[i][j] = consist;
+		}
+	}
+
+	if (isPrinted) {
+		if (addString != nullptr)
+		{
+			cout << "[" << addString << "] ";
+		}
+
+		cout << "{";
+		for (int i = 0; i < size_a; i++)
+		{
+			for (int j = 0; j < size_b; j++)
+			{
+				cout << "(" << res[i][j][0] << ", " << res[i][j][1] << ") ";
+			}
+			if (i == size_a - 1)
+			{
+				cout << "}" << endl;
+			}
+		}
+	}
+
+	return res;
+}
+
+// A^2
+// {0, 3, 5}^2 = {(0, 0), (0, 3), (0, 5), ()}
+int*** Pow2(const int* a, const int size_a, int size[], bool isPrinted = false, const char* addString = nullptr)
+{
+	if (size != nullptr)
+	{
+		size[0] = size_a;
+		size[1] = 2;
+	}
+
+	int*** res = new int** [size_a];
+	for (int i = 0; i < size_a; i++)
+	{
+		res[i] = new int* [size_a];
+		for (int j = 0; j < size_a; j++)
+		{
+			int* consist = new int[2]{ a[i], a[j] };
+			res[i][j] = consist;
+		}
+	}
+
+	if (isPrinted) {
+		if (addString != nullptr)
+		{
+			cout << "[" << addString << "] ";
+		}
+
+		cout << "{";
+		for (int i = 0; i < size_a; i++)
+		{
+			for (int j = 0; j < size_a; j++)
+			{
+				cout << "(" << res[i][j][0] << ", " << res[i][j][1] << ") ";
+			}
+			if (i == size_a - 1)
+			{
+				cout << "}" << endl; 
+			}
+		}
+	}
+
+	return nullptr;
+}
+
 int main()
 {
 	// U[25]
 	SetUniversalPlural(1, 25);
+
 	PrintPluar(UniversalPlural, UniversalPluralSize, "U");
 	PrintPluar(A, SizeA, "A");
 	PrintPluar(B, SizeB, "B");
@@ -234,6 +340,14 @@ int main()
 	int size_p5;
 	int *p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
 	PrintPluar(p5, size_p5, "((A u C)\\C u B)\\(!C)");
+
+	PrintPluar(A, SizeA, "A");
+	PrintPluar(B, SizeB, "B");
+	cout << endl;
+
+	int* size = nullptr; // тому що ми не використовуєм size
+	int*** pluar = Multiply(A, SizeA, B, SizeB, size, true, "AxB");
+	pluar = Pow2(A, SizeA, size, true, "A^2");
 
 	return 0;
 }
