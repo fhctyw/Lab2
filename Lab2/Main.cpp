@@ -351,6 +351,7 @@ int main()
 	int size_p5;
 	int* p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
 	PrintPluar(p5, size_p5, "((A u C)\\C u B)\\(!C)");
+
 #endif // VERSION_1
 
 #ifdef VERSION_2
