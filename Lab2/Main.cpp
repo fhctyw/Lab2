@@ -362,6 +362,7 @@ int main()
 	int* size = nullptr; // тому що ми не використовуєм size
 	int*** pluar = Multiply(A, SizeA, B, SizeB, size, true, "AxB");
 	pluar = Pow2(A, SizeA, size, true, "A^2");
+
 #endif // VERSION_2
 
 	return 0;
