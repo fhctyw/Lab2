@@ -3,9 +3,18 @@
 #include <cmath>
 using namespace std;
 
+
 // Your defines
-#define VERSION_1
-//
+
+#define VERSION_2
+
+/*
+	#define VERSION_1
+	
+	OR
+
+	#define VERSION_2
+*/
 
 #define GET_ARRAY_LENGHT _countof
 
@@ -195,9 +204,9 @@ int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& si
 			}
 		}
 	}
-	
+
 	size = s;
-	int *res = new int[size];
+	int* res = new int[size];
 	for (int i = 0, s = 0; i < size_a; i++)
 	{
 		for (int j = 0; j < size_b; j++)
@@ -218,7 +227,7 @@ int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& si
 
 // A x B
 // {0, 3, 5} x {3, 7} = { (0, 3), {0, 7}, (3, 3), (3, 7), (5, 3), (5, 7) }
-int*** Multiply(const int *a, const int size_a, const int *b, const int size_b, int size[], bool isPrinted = false, const char* addString = nullptr)
+int*** Multiply(const int* a, const int size_a, const int* b, const int size_b, int size[], bool isPrinted = false, const char* addString = nullptr)
 {
 	if (size != nullptr)
 	{
@@ -227,13 +236,13 @@ int*** Multiply(const int *a, const int size_a, const int *b, const int size_b, 
 		size[2] = 2;
 	}
 
-	int ***res = new int**[size_a];
+	int*** res = new int** [size_a];
 	for (int i = 0; i < size_a; i++)
 	{
-		res[i] = new int*[size_b];
+		res[i] = new int* [size_b];
 		for (int j = 0; j < size_b; j++)
 		{
-			int * consist = new int[2]{ a[i], b[j] };
+			int* consist = new int[2]{ a[i], b[j] };
 			res[i][j] = consist;
 		}
 	}
@@ -297,7 +306,7 @@ int*** Pow2(const int* a, const int size_a, int size[], bool isPrinted = false, 
 			}
 			if (i == size_a - 1)
 			{
-				cout << "}" << endl; 
+				cout << "}" << endl;
 			}
 		}
 	}
@@ -309,6 +318,8 @@ int main()
 {
 	// U[25]
 	SetUniversalPlural(1, 25);
+
+#ifdef VERSION_1
 
 	PrintPluar(UniversalPlural, UniversalPluralSize, "U");
 	PrintPluar(A, SizeA, "A");
@@ -338,8 +349,11 @@ int main()
 
 	// (((A u C) \ C) u B) \ (!C)
 	int size_p5;
-	int *p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
+	int* p5 = Divide(p4, size_p4, p2, size_p2, size_p5);
 	PrintPluar(p5, size_p5, "((A u C)\\C u B)\\(!C)");
+#endif // VERSION_1
+
+#ifdef VERSION_2
 
 	PrintPluar(A, SizeA, "A");
 	PrintPluar(B, SizeB, "B");
@@ -348,6 +362,7 @@ int main()
 	int* size = nullptr; // тому що ми не використовуєм size
 	int*** pluar = Multiply(A, SizeA, B, SizeB, size, true, "AxB");
 	pluar = Pow2(A, SizeA, size, true, "A^2");
+#endif // VERSION_2
 
 	return 0;
 }
