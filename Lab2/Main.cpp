@@ -6,7 +6,7 @@ using namespace std;
 
 // Your defines
 
-#define VERSION_2
+#define VERSION_1
 
 /*
 	#define VERSION_1
@@ -24,6 +24,7 @@ int* UniversalPlural;
 // input
 
 #ifdef VERSION_1
+
 int A[] = { 1, 2, 3, 4, 13, 14, 16, 17, 21 };
 int B[] = { 1, 3, 4, 5, 6, 13, 14, 15, 20, 21 };
 int C[] = { 1, 9, 10, 11, 12, 13, 18, 19, 24 };
@@ -75,26 +76,52 @@ void PrintPluar(const int* p, const int size, const char* addString = nullptr)
 	cout << "}" << endl;
 }
 
+// A + B
+// {0, 1, 2, 3} + {5, 8, 0, 1, 2} = {0, 0, 1, 1, 2, 2, 3, 5, 8}
+int* Add(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
+{
+	size = size_a + size_b;  // 4 + 5
+	int* res = new int[size]; // {0, 0, 0, 0, 0, 0, 0, 0, 0}
+	int total;
+	int index_a = 0;
+
+	for (index_a = 0; index_a < size_a; index_a++)
+	{
+		res[index_a] = a[index_a]; // {0, 1, 2, 3, 0, 0, 0, 0, 0}
+	}
+	total = index_a;
+
+	for (int i = 0; i < size_b; i++, total++)
+	{
+		res[total] = b[i]; // {0, 1, 2, 3, 5, 8, 0, 1, 2}
+	}
+
+	if (isSort)
+		sort(res, res + size);  // {0, 0, 1, 1, 2, 2, 3, 5, 8}
+
+	return res;
+}
+
 // A \ B
-// {0, 4, -1, 5} \ {2, 3, 5, -2, 0} = {4, -1}
+// {0, 4, -1, 5} \ {2, 3, 5, -2, 0} = {-1, 4}
 int* Divide(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
 {
 	int index = 0;
-	int* tmp = new int[size_a];
+	int* tmp = new int[size_a]; // {0, 0, 0, 0}
 	for (int i = 0; i < size_a; i++)
 	{
 		for (int j = 0; j < size_b; j++)
 		{
 			if (a[i] == b[j])
 			{
-				tmp[index] = i;
+				tmp[index] = i;  // {0, 3} масив з індексами елементій, які треба видалити
 				index++;
 			}
 		}
 	}
 
-	size = size_a - index;
-	int* res = new int[size];
+	size = size_a - index; // 4 - 2
+	int* res = new int[size]; // {0, 0}
 
 	for (int i = 0, i1 = 0; i < size_a; i++)
 	{
@@ -104,7 +131,7 @@ int* Divide(const int* a, const int size_a, const int* b, const int size_b, int&
 		}
 		else
 		{
-			res[i - i1] = a[i];
+			res[i - i1] = a[i]; // {4, -1}
 		}
 	}
 
@@ -112,31 +139,7 @@ int* Divide(const int* a, const int size_a, const int* b, const int size_b, int&
 	tmp = nullptr;
 
 	if (isSort)
-		sort(res, res + size);
-
-	return res;
-}
-
-// A + B
-// {0, 1, 2, 3} + {5, 8, 0, 1, 2} = {0, 1, 2, 3, 5, 8, 0, 1, 2}
-int* Add(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
-{
-	size = size_a + size_b;
-	int* res = new int[size];
-	int total = 0;
-
-	for (int i = 0; i < size_a; i++, total++)
-	{
-		res[i] = a[i];
-	}
-
-	for (int i = 0; i < size_b && total < size; i++, total++)
-	{
-		res[total] = b[i];
-	}
-
-	if (isSort)
-		sort(res, res + size);
+		sort(res, res + size); // {-1, 4}
 
 	return res;
 }
@@ -145,8 +148,8 @@ int* Add(const int* a, const int size_a, const int* b, const int size_b, int& si
 // {0, -1, -3, 5, 4, 9} u {3, 2, 5, 6, 7} = {-3, -1, 0, 2, 3, 4, 5, 6, 7, 9 }
 int* Unification(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
 {
-	int* tmp = new int[size_b];
-	int indexTmpArray = 0;
+	int* tmp = new int[size_b];	// {0, 0, 0, 0, 0}
+	int index = 0; // змінна для кількості елементій які повторюються
 
 	for (int i = 0; i < size_a; i++)
 	{
@@ -154,30 +157,19 @@ int* Unification(const int* a, const int size_a, const int* b, const int size_b,
 		{
 			if (a[i] == b[j])
 			{
-				tmp[indexTmpArray] = a[i];
-				indexTmpArray++;
+				tmp[index] = a[i]; // {5}
+				index++;
 			}
 		}
 	}
-
-	int* tmp1 = new int[indexTmpArray];
-	for (int i = 0; i < indexTmpArray; i++)
-	{
-		tmp1[i] = tmp[i];
-		//cout << tmp[i] << " ";
-	}
-
-	delete[] tmp;
-	tmp = nullptr;
+	
 	int s;
-	int* tmp2 = Divide(b, size_b, tmp1, indexTmpArray, s);
+	int* tmp2 = Divide(b, size_b, tmp, index, s); // {3, 2, 5, 6, 7} \ {5} = {3, 2, 6, 7}
 
-	delete[] tmp1;
-
-	int* res = Add(tmp2, s, a, size_a, size);
+	int* res = Add(tmp2, s, a, size_a, size); // {3, 2, 6, 7, 0, -1, -3, 4, 9}
 
 	if (isSort)
-		sort(res, res + size);
+		sort(res, res + size); // {-3, -1, 0, 2, 3, 4, 5, 6, 7, 9 }
 
 	return res;
 }
@@ -186,14 +178,15 @@ int* Unification(const int* a, const int size_a, const int* b, const int size_b,
 // {1, 3, 5, 7, 14} = { 2, 4, 6, 8, 9, 10, 11, 12, 13, 15, ... , 25 }
 int* Not(const int* a, const int size_a, int& size, bool isSort = true)
 {
-	return Divide(UniversalPlural, UniversalPluralSize, a, size_a, size);
+	// !A = U \ A
+	return Divide(UniversalPlural, UniversalPluralSize, a, size_a, size); // {1, 2, ... , 24, 25} \ {1, 3, 5, 7, 14} = {}
 }
 
 // A ^ B
-//   { 0, -1, 3, 5, 6 } ^ { 2, 3, 9, 10, 6 } = { 3, 6 }
+// { 0, -1, 3, 5, 6 } ^ { 2, 3, 9, 10, 6 } = { 3, 6 }
 int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& size, bool isSort = true)
 {
-	int s = 0;
+	int s = 0; // змінна для кількості елементій які повторюються, щоб створити масив
 	for (int i = 0; i < size_a; i++)
 	{
 		for (int j = 0; j < size_b; j++)
@@ -205,22 +198,22 @@ int* Cut(const int* a, const int size_a, const int* b, const int size_b, int& si
 		}
 	}
 
-	size = s;
-	int* res = new int[size];
+	size = s; // 2
+	int* res = new int[size]; // {0, 0}
 	for (int i = 0, s = 0; i < size_a; i++)
 	{
 		for (int j = 0; j < size_b; j++)
 		{
 			if (a[i] == b[j])
 			{
-				res[s] = a[i];
+				res[s] = a[i]; // {3, 6}
 				s++;
 			}
 		}
 	}
 
 	if (isSort)
-		sort(res, res + size);
+		sort(res, res + size); // {3, 6}
 
 	return res;
 }
@@ -311,7 +304,7 @@ int*** Pow2(const int* a, const int size_a, int size[], bool isPrinted = false, 
 		}
 	}
 
-	return nullptr;
+	return res;
 }
 
 int main()
@@ -320,7 +313,6 @@ int main()
 	SetUniversalPlural(1, 25);
 
 #ifdef VERSION_1
-
 	PrintPluar(UniversalPlural, UniversalPluralSize, "U");
 	PrintPluar(A, SizeA, "A");
 	PrintPluar(B, SizeB, "B");
@@ -363,7 +355,7 @@ int main()
 	int* size = nullptr; // тому що ми не використовуєм size
 	int*** pluar = Multiply(A, SizeA, B, SizeB, size, true, "AxB");
 	pluar = Pow2(A, SizeA, size, true, "A^2");
-
+	
 #endif // VERSION_2
 
 	return 0;
